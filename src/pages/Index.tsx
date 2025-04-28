@@ -1,15 +1,41 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Bluetooth, Car, Database, HardDrive, Settings, WifiHigh } from 'lucide-react';
+import { Bluetooth, Car, Database, HardDrive, Settings, WifiHigh, RefreshCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import StatusIndicator from '@/components/ui/status-indicator';
+import StatusIndicator, { StatusType } from '@/components/ui/status-indicator';
+import { cn } from '@/lib/utils';
 
 const Index = () => {
+  // Simulation d'un état dynamique pour la démo
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [systemStatus, setSystemStatus] = React.useState<StatusType>('online');
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    setSystemStatus('waiting');
+    
+    // Simulation d'une requête réseau
+    setTimeout(() => {
+      setRefreshing(false);
+      setSystemStatus('online');
+    }, 1500);
+  };
+
   return (
     <div className="animate-fade-in">
-      <h1 className="text-3xl font-bold mb-6">Tableau de bord diagnostic</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+        <h1 className="text-3xl font-bold mb-2 sm:mb-0">Tableau de bord diagnostic</h1>
+        <Button 
+          onClick={handleRefresh} 
+          variant="outline" 
+          disabled={refreshing}
+          className="flex items-center space-x-2"
+        >
+          <RefreshCcw className={cn("h-4 w-4", refreshing && "animate-spin")} />
+          <span>Actualiser</span>
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         {/* Statut du système */}
@@ -21,7 +47,7 @@ const Index = () => {
                 <Settings size={16} />
                 <span>Système</span>
               </div>
-              <StatusIndicator status="online" />
+              <StatusIndicator status={systemStatus} />
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
@@ -88,6 +114,59 @@ const Index = () => {
           </Button>
           <div className="text-xs text-gray-500 text-center">
             Adaptateur Bluetooth ELM327 requis
+          </div>
+        </Card>
+      </div>
+
+      {/* Différentes variantes du StatusIndicator */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4">Types d'indicateurs d'état</h2>
+        <Card className="p-4 shadow-md">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex flex-col space-y-2">
+              <h3 className="font-medium">Indicateurs standard</h3>
+              <div className="space-y-2">
+                <StatusIndicator status="online" />
+                <StatusIndicator status="offline" />
+                <StatusIndicator status="waiting" />
+                <StatusIndicator status="disconnected" />
+                <StatusIndicator status="error" />
+                <StatusIndicator status="success" />
+                <StatusIndicator status="warning" />
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              <h3 className="font-medium">Taille petite</h3>
+              <div className="space-y-2">
+                <StatusIndicator status="online" size="sm" />
+                <StatusIndicator status="offline" size="sm" />
+                <StatusIndicator status="waiting" size="sm" />
+                <StatusIndicator status="disconnected" size="sm" />
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              <h3 className="font-medium">Taille grande</h3>
+              <div className="space-y-2">
+                <StatusIndicator status="online" size="lg" />
+                <StatusIndicator status="offline" size="lg" />
+                <StatusIndicator status="waiting" size="lg" />
+                <StatusIndicator status="error" size="lg" />
+              </div>
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+              <h3 className="font-medium">Style badge</h3>
+              <div className="space-y-2">
+                <StatusIndicator status="online" showDot={false} />
+                <StatusIndicator status="offline" showDot={false} />
+                <StatusIndicator status="waiting" showDot={false} />
+                <StatusIndicator status="error" showDot={false} />
+                <StatusIndicator status="success" showDot={false} />
+                <StatusIndicator status="warning" showDot={false} />
+              </div>
+            </div>
           </div>
         </Card>
       </div>
